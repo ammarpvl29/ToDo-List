@@ -41,7 +41,7 @@ Follow these steps to set up the Laravel To-Do List App on your local machine:
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/phoenixxbasit/laravel-todolist.git
+   git clone https://github.com/ammarpvl29/ToDo-List.git
    ```
 
 2. **Change directory:**
