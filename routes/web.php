@@ -3,7 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\TaskController;
-
+use App\Http\Controllers\ChatbotController;
+use App\Http\Controllers\PomodoroController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -22,7 +23,11 @@ Route::post('/login', [UserController::class, 'authenticate'])->name('user.login
 Route::get('/logout', [UserController::class, 'logout'])->name('user.logout')->middleware('auth');
 Route::post('/register', [UserController::class, 'register'])->name('user.register');
 Route::resource('tasks', TaskController::class)->middleware('auth');
-
+// In routes/web.php
+Route::post('/chatbot/send', [App\Http\Controllers\ChatbotController::class, 'sendMessage'])->name('chatbot.send');
+Route::get('/tasks/pomodoro', [PomodoroController::class, 'index'])->name('pomodoro.index');
+Route::post('/chatbot/message', [ChatbotController::class, 'handleChatbotRequest'])
+    ->name('chatbot.message');
 // Route::group(['middleware' => ['auth:sanctum']], function () {
 //     Route::resource('tasks', 'TaskController');
 // });

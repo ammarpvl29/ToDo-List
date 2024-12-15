@@ -126,6 +126,12 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
+        'openrouter' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/openrouter.log'),
+            'level' => 'debug',
+            'days' => 14,
+        ],
     ],
 
 ];
