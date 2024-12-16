@@ -1,43 +1,51 @@
 <x-layout>
-    <!DOCTYPE html>
-    <html class="dark" style="color-scheme: dark;">
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Sofia+Sans:wght@200&display=swap" rel="stylesheet">
-        
-        @stack('styles')
-        <link rel="stylesheet" href="{{ asset('css/general.css') }}">
-        <link rel="stylesheet" href="{{ asset('css/buttons.css') }}">
-        <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-        <title>Pomodoro Timer</title>
-    </head>
-    <body>
-        <div class="pomodoro-part">
-            <div class="web-title">
-                <div>Pomodoro - Made by <a href="https://github.com/PeterBaptista" target="_blank">WebPro Team 3</a></div>
+    <div class="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 p-6">
+        <div class="max-w-4xl mx-auto">
+            @auth
+            <div class="text-right mb-4">
+                <a href="{{ route('tasks.index') }}" class="mr-4 px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-all duration-300 shadow-md hover:shadow-lg inline-flex items-center">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to Tasks
+                </a>
+                <a href="{{ route('user.logout') }}" class="px-4 py-2 rounded-full bg-red-500 text-white hover:bg-red-600 transition-all duration-300 shadow-md hover:shadow-lg">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Log Out
+                </a>
             </div>
-            <div class="container">
-                <div class="type-section">
-                    <button class="type-button" id="pomodoro-button">Pomodoro</button>
-                    <button class="type-button" id="short-break-button">Short Break</button>
-                    <button class="type-button" id="long-break-button">Long Break</button>
+            @endauth
+
+            <div class="bg-white rounded-xl shadow-2xl overflow-hidden">
+                <div class="bg-gradient-to-r from-gray-800 to-gray-700 p-6">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-3xl font-bold text-white">Pomodoro Timer</h2>
+                    </div>
                 </div>
-                <div id="timer">
-                    25:00
-                </div>
-                <div class="control-section">
-                    <button id="control-button">Start</button>
+
+                <div class="p-6">
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <!-- Pomodoro Timer Content Goes Here -->
+                        <div id="pomodoro-container" class="text-center">
+                            <div id="timer" class="text-6xl font-bold text-gray-800 mb-6">
+                                25:00
+                            </div>
+                            
+                            <div class="flex justify-center space-x-4">
+                                <button id="start-btn" class="px-6 py-3 bg-green-500 text-white rounded-full hover:bg-green-600 transition-all duration-300">
+                                    Start
+                                </button>
+                                <button id="pause-btn" class="px-6 py-3 bg-yellow-500 text-white rounded-full hover:bg-yellow-600 transition-all duration-300">
+                                    Pause
+                                </button>
+                                <button id="reset-btn" class="px-6 py-3 bg-red-500 text-white rounded-full hover:bg-red-600 transition-all duration-300">
+                                    Reset
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        @push('scripts')
+    @push('scripts')
         <script src="{{ asset('js/pomodoro.js') }}"></script>
-        @endpush
-    </body>
-    </html>
+    @endpush
 </x-layout>
