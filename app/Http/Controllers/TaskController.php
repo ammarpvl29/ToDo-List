@@ -5,20 +5,24 @@ namespace App\Http\Controllers;
 use App\Models\Task;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
+use App\Services\ProductivityMetricsService;
 
 class TaskController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(ProductivityMetricsService $productivityService)
     {
-        // dd(Task::where('user_id',auth()->id())->get());
+        $user_id = auth()->id();
+        $tasks = Task::where('user_id', $user_id)->get();
+        $metrics = $productivityService->calculateMetrics($user_id);
+        
         return view("tasks/index", [
-            'tasks' => Task::where('user_id',auth()->id())->get()
+            'tasks' => $tasks,
+            'metrics' => $metrics
         ]);
     }
-
     /**
      * Show the form for creating a new resource.
      */
@@ -36,12 +40,13 @@ class TaskController extends Controller
             "Title" => ["required", "min:6"],
             "Description" => 'required|min:6',
         ]);
-
+    
         $formfields["Completed"] = 0;
         $formfields["user_id"] = auth()->id();
-
+        $formfields["completed_at"] = null;
+    
         $Task = Task::create($formfields);
-        return redirect('/tasks')->with('message', 'Tasks created successfully!');
+        return redirect('/tasks')->with('message', 'Task created successfully!');
     }
 
     /**
@@ -68,22 +73,31 @@ class TaskController extends Controller
      */
     public function update(UpdateTaskRequest $request, Task $task)
     {
-
         if ($task->user_id !== auth()->id()) {
             abort(403, "Unauthorized Action");
         }
-
+    
         $formfields = $request->validate([
             "Title" => ["required", "min:6"],
             "Description" => 'required|min:6',
         ]);
-
-        $formfields["Completed"] = $request->Completed == "on" ? 1 : 0;
+    
+        $wasCompleted = $task->Completed;
+        $isNowCompleted = $request->Completed == "on";
+    
+        $formfields["Completed"] = $isNowCompleted ? 1 : 0;
         $formfields["user_id"] = auth()->id();
-
+        
+        // Set completed_at timestamp when task is marked as completed
+        if (!$wasCompleted && $isNowCompleted) {
+            $formfields["completed_at"] = now();
+        } elseif ($wasCompleted && !$isNowCompleted) {
+            $formfields["completed_at"] = null;
+        }
+    
         $task->update($formfields);
-
-        return redirect('/tasks')->with('message', 'Tasks created successfully!');
+    
+        return redirect('/tasks')->with('message', 'Task updated successfully!');
     }
 
     /**

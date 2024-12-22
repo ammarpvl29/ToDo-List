@@ -6,8 +6,8 @@ use Illuminate\Http\Request;
 
 class PomodoroController extends Controller
 {
-    public function showPomodoro()
-    {
+    public function index()
+    {   
         return view('tasks.pomodoro');
     }
 }

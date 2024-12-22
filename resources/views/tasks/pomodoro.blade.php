@@ -48,4 +48,10 @@
     @push('scripts')
         <script src="{{ asset('js/pomodoro.js') }}"></script>
     @endpush
+
+    @push('scripts')
+        <script src="{{ asset('js/chatbot.js') }}"></script>
+    @endpush
+
+    @include('components.chatbot-sidebar')
 </x-layout>

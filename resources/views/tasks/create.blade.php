@@ -1,4 +1,3 @@
-< --- create.blade.php --- >
 <x-layout>
     <div class="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 p-6">
         <div class="max-w-2xl mx-auto">

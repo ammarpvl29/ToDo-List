@@ -1,45 +1,111 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const timerDisplay = document.getElementById('timer');
-    const startBtn = document.getElementById('start-btn');
-    const pauseBtn = document.getElementById('pause-btn');
-    const resetBtn = document.getElementById('reset-btn');
+// Time configuration (in minutes)
+const POMODORO_TIME = 25;
+const MILLISECONDS = 1000;
+const SECONDS_IN_MINUTE = 60;
 
-    let interval;
-    let timeLeft = 25 * 60; // 25 minutes
-    let isRunning = false;
+class PomodoroTimer {
+    constructor() {
+        // Initialize DOM elements
+        this.timerDisplay = document.getElementById('timer');
+        this.startButton = document.getElementById('start-btn');
+        this.pauseButton = document.getElementById('pause-btn');
+        this.resetButton = document.getElementById('reset-btn');
 
-    function updateDisplay() {
-        const minutes = Math.floor(timeLeft / 60);
-        const seconds = timeLeft % 60;
-        timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        // Initialize timer state
+        this.timeLeft = POMODORO_TIME * SECONDS_IN_MINUTE;
+        this.isRunning = false;
+        this.timerId = null;
+
+        // Bind event listeners
+        this.startButton.addEventListener('click', () => this.startTimer());
+        this.pauseButton.addEventListener('click', () => this.pauseTimer());
+        this.resetButton.addEventListener('click', () => this.resetTimer());
+
+        // Initial UI setup
+        this.updateDisplay();
+        this.pauseButton.disabled = true;
+        this.pauseButton.classList.add('opacity-50', 'cursor-not-allowed');
     }
 
-    startBtn.addEventListener('click', () => {
-        if (!isRunning) {
-            isRunning = true;
-            interval = setInterval(() => {
-                if (timeLeft > 0) {
-                    timeLeft--;
-                    updateDisplay();
-                } else {
-                    clearInterval(interval);
-                    isRunning = false;
+    startTimer() {
+        if (!this.isRunning) {
+            this.isRunning = true;
+            this.startButton.disabled = true;
+            this.startButton.classList.add('opacity-50', 'cursor-not-allowed');
+            this.pauseButton.disabled = false;
+            this.pauseButton.classList.remove('opacity-50', 'cursor-not-allowed');
+
+            this.timerId = setInterval(() => {
+                this.timeLeft--;
+                this.updateDisplay();
+
+                if (this.timeLeft <= 0) {
+                    this.timerComplete();
                 }
-            }, 1000);
+            }, MILLISECONDS);
         }
-    });
+    }
 
-    pauseBtn.addEventListener('click', () => {
-        clearInterval(interval);
-        isRunning = false;
-    });
+    pauseTimer() {
+        if (this.isRunning) {
+            this.isRunning = false;
+            clearInterval(this.timerId);
+            this.startButton.disabled = false;
+            this.startButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            this.pauseButton.disabled = true;
+            this.pauseButton.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+    }
 
-    resetBtn.addEventListener('click', () => {
-        clearInterval(interval);
-        timeLeft = 25 * 60;
-        isRunning = false;
-        updateDisplay();
-    });
+    resetTimer() {
+        this.pauseTimer();
+        this.timeLeft = POMODORO_TIME * SECONDS_IN_MINUTE;
+        this.updateDisplay();
+        this.startButton.disabled = false;
+        this.startButton.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
 
-    updateDisplay();
+    updateDisplay() {
+        const minutes = Math.floor(this.timeLeft / SECONDS_IN_MINUTE);
+        const seconds = this.timeLeft % SECONDS_IN_MINUTE;
+        this.timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+
+    timerComplete() {
+        this.pauseTimer();
+        this.playNotificationSound();
+        this.showNotification();
+    }
+
+    playNotificationSound() {
+        // Create and play a notification sound
+        const audio = new Audio('mixkit-doorbell-tone-2864.wav');
+        audio.play();
+    }
+
+    showNotification() {
+        // Check if browser supports notifications
+        if ('Notification' in window) {
+            if (Notification.permission === 'granted') {
+                new Notification('Pomodoro Timer', {
+                    body: 'Time is up! Take a break.',
+                    icon: '/favicon.ico'
+                });
+            } else if (Notification.permission !== 'denied') {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        new Notification('Pomodoro Timer', {
+                            body: 'Time is up! Take a break.',
+                            icon: '/favicon.ico'
+                        });
+                    }
+                });
+            }
+        }
+    }
+}
+
+// Initialize the Pomodoro timer
+document.addEventListener('DOMContentLoaded', () => {
+    new PomodoroTimer();
 });

@@ -22,11 +22,12 @@ Route::get('/register', [UserController::class, 'registerDisplay'])->name('user.
 Route::post('/login', [UserController::class, 'authenticate'])->name('user.login');
 Route::get('/logout', [UserController::class, 'logout'])->name('user.logout')->middleware('auth');
 Route::post('/register', [UserController::class, 'register'])->name('user.register');
+Route::get('/tasks/pomodoro', [PomodoroController::class, 'index'])->name('pomodoro.index');
+Route::get('/tasks/pomodoro', [PomodoroController::class, 'index'])->name('pomodoro.index')->middleware('auth');
 Route::resource('tasks', TaskController::class)->middleware('auth');
 Route::post('/chatbot/send', [App\Http\Controllers\ChatbotController::class, 'sendMessage'])->name('chatbot.send');
-Route::get('/tasks/pomodoro', [PomodoroController::class, 'showPomodoro'])->name('pomodoro.index');
-Route::get('/debug-pomodoro', function() {
-    return 'Pomodoro Debug Route Works!';
+Route::get('/test-pomodoro', function() {
+    dd('Test route works');
 });
 Route::post('/chatbot/message', [ChatbotController::class, 'handleChatbotRequest'])
     ->name('chatbot.message');

@@ -1,4 +1,3 @@
-< --- index.blade.php --- >
 <x-layout>
     <head>
         <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -56,15 +55,15 @@
                     <div class="space-y-4">
                         <div class="flex justify-between border-b pb-2 border-gray-200">
                             <span class="text-gray-600 font-semibold">Avg. Task Completion Time</span>
-                            <span class="font-bold text-purple-600">2.5 days</span>
+                            <span class="font-bold text-purple-600">{{ $metrics['avgCompletionTime'] }} days</span>
                         </div>
                         <div class="flex justify-between border-b pb-2 border-gray-200">
                             <span class="text-gray-600 font-semibold">Tasks This Week</span>
-                            <span class="font-bold text-indigo-600">{{ $tasks->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count() }}</span>
+                            <span class="font-bold text-indigo-600">{{ $metrics['tasksThisWeek'] }}</span>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-gray-600 font-semibold">Productivity Score</span>
-                            <span class="font-bold text-green-600">78%</span>
+                            <span class="font-bold text-green-600">{{ $metrics['productivityScore'] }}%</span>
                         </div>
                     </div>
                 </div>

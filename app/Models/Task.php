@@ -16,6 +16,8 @@ class Task extends Model
         'Completed',
         'user_id'
     ];
+	
+	protected $dates = ['created_at', 'updated_at', 'completed_at'];
 
     public function users()
     {

@@ -13,6 +13,7 @@
   <script src="//unpkg.com/alpinejs" defer></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="{{ asset('js/chatbot.js') }}" defer></script>
+  <script src="{{ asset('js/pomodoro.js') }}" defer></script>
   <script>
     tailwind.config = {
         theme: {
