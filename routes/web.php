@@ -5,6 +5,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\PomodoroController;
+use App\Http\Controllers\TaskAnalyticsController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -22,6 +24,9 @@ Route::get('/register', [UserController::class, 'registerDisplay'])->name('user.
 Route::post('/login', [UserController::class, 'authenticate'])->name('user.login');
 Route::get('/logout', [UserController::class, 'logout'])->name('user.logout')->middleware('auth');
 Route::post('/register', [UserController::class, 'register'])->name('user.register');
+Route::get('/tasks/analytics', [TaskAnalyticsController::class, 'index'])
+    ->middleware(['auth'])
+    ->name('tasks.analytics');
 Route::get('/tasks/pomodoro', [PomodoroController::class, 'index'])->name('pomodoro.index');
 Route::get('/tasks/pomodoro', [PomodoroController::class, 'index'])->name('pomodoro.index')->middleware('auth');
 Route::resource('tasks', TaskController::class)->middleware('auth');

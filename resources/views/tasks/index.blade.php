@@ -10,7 +10,7 @@
                     <a href="{{ route('pomodoro.index') }}" class="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all duration-300 shadow-md hover:shadow-lg inline-flex items-center">
                         <i class="fas fa-clock mr-2 text-sm"></i>Pomodoro Timer
                     </a>
-                    <a href="#" class="px-4 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-all duration-300 shadow-md hover:shadow-lg inline-flex items-center">
+                    <a href="{{ route('tasks.analytics') }}" class="px-4 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-all duration-300 shadow-md hover:shadow-lg inline-flex items-center">
                         <i class="fas fa-chart-bar mr-2 text-sm"></i>Analytics
                     </a>
                 </div>
