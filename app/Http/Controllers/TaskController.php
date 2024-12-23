@@ -6,6 +6,7 @@ use App\Models\Task;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
 use App\Services\ProductivityMetricsService;
+use Illuminate\Support\Facades\Log;
 
 class TaskController extends Controller
 {
@@ -15,12 +16,76 @@ class TaskController extends Controller
     public function index(ProductivityMetricsService $productivityService)
     {
         $user_id = auth()->id();
-        $tasks = Task::where('user_id', $user_id)->get();
+        $query = Task::where('user_id', $user_id);
+    
+        // Apply filters...
+        if (request('category')) {
+            $query->where('Category', request('category'));
+        }
+    
+        if (request('priority')) {
+            $query->where('Priority', request('priority'));
+        }
+    
+        if (request('status')) {
+            if (request('status') === 'completed') {
+                $query->where('Completed', true);
+            } elseif (request('status') === 'pending') {
+                $query->where('Completed', false);
+            }
+        }
+    
+        // Add sorting
+        $sort = request('sort', 'created_at');
+        $direction = request('direction', 'desc');
+        
+        switch($sort) {
+            case 'due_date':
+                $query->orderBy('DueDate', $direction);
+                break;
+            case 'priority':
+                $query->orderBy('Priority', $direction);
+                break;
+            case 'category':
+                $query->orderBy('Category', $direction);
+                break;
+            default:
+                $query->orderBy('created_at', $direction);
+        }
+    
+        // Add search functionality
+        if (request('search')) {
+            $search = request('search');
+            $query->where(function($q) use ($search) {
+                $q->where('Title', 'like', "%{$search}%")
+                  ->orWhere('Description', 'like', "%{$search}%")
+                  ->orWhere('Category', 'like', "%{$search}%");
+            });
+        }
+    
+        $tasks = $query->latest()->get();
         $metrics = $productivityService->calculateMetrics($user_id);
         
+        // Add task statistics
+        $statistics = [
+            'total' => $tasks->count(),
+            'completed' => $tasks->where('Completed', true)->count(),
+            'pending' => $tasks->where('Completed', false)->count(),
+            'overdue' => $tasks->where('Completed', false)
+                              ->where('DueDate', '<', now())
+                              ->count(),
+            'due_today' => $tasks->where('Completed', false)
+                                ->where('DueDate', '>=', now()->startOfDay())
+                                ->where('DueDate', '<=', now()->endOfDay())
+                                ->count()
+        ];
+    
         return view("tasks/index", [
             'tasks' => $tasks,
-            'metrics' => $metrics
+            'metrics' => $metrics,
+            'statistics' => $statistics,
+            'currentSort' => $sort,
+            'currentDirection' => $direction
         ]);
     }
     /**
@@ -36,16 +101,23 @@ class TaskController extends Controller
      */
     public function store(StoreTaskRequest $request)
     {
-        $formfields = $request->validate([
+        $formFields = $request->validate([
             "Title" => ["required", "min:6"],
             "Description" => 'required|min:6',
+            "Category" => 'nullable|string',
+            "Priority" => 'nullable|string|in:low,medium,high',
+            "DueDate" => 'nullable|date',
+            "EstimatedTime" => 'nullable|integer'
         ]);
     
-        $formfields["Completed"] = 0;
-        $formfields["user_id"] = auth()->id();
-        $formfields["completed_at"] = null;
+        $formFields["Completed"] = false;
+        $formFields["user_id"] = auth()->id();
+        
+        // Set defaults if not provided
+        $formFields["Category"] = $formFields["Category"] ?? 'general';
+        $formFields["Priority"] = $formFields["Priority"] ?? 'medium';
     
-        $Task = Task::create($formfields);
+        Task::create($formFields);
         return redirect('/tasks')->with('message', 'Task created successfully!');
     }
 
@@ -82,16 +154,17 @@ class TaskController extends Controller
             "Description" => 'required|min:6',
         ]);
     
+        // Check if the task is being marked as completed
         $wasCompleted = $task->Completed;
-        $isNowCompleted = $request->Completed == "on";
+        $isNowCompleted = $request->has('Completed');
     
-        $formfields["Completed"] = $isNowCompleted ? 1 : 0;
-        $formfields["user_id"] = auth()->id();
+        // Update the completion status
+        $formfields["Completed"] = $isNowCompleted;
         
-        // Set completed_at timestamp when task is marked as completed
+        // Update completed_at timestamp
         if (!$wasCompleted && $isNowCompleted) {
             $formfields["completed_at"] = now();
-        } elseif ($wasCompleted && !$isNowCompleted) {
+        } elseif (!$isNowCompleted) {
             $formfields["completed_at"] = null;
         }
     
@@ -113,5 +186,29 @@ class TaskController extends Controller
 
         return redirect('/tasks')->with('message', 'Tasks deleted successfully!');
 
+    }
+
+    public function archive()
+    {
+        $archivedTasks = Task::where('user_id', auth()->id())
+            ->where('Completed', true)
+            ->whereNotNull('completed_at')
+            ->orderBy('completed_at', 'desc')
+            ->get();
+    
+        // Add this for debugging
+        Log::info('Archived tasks query:', [
+            'user_id' => auth()->id(),
+            'count' => $archivedTasks->count(),
+            'tasks' => $archivedTasks->toArray()
+        ]);
+    
+        return view('tasks.archive', compact('archivedTasks'));
+    }
+
+    public function toggleComplete(Task $task)
+    {
+        $task->update(['Completed' => !$task->Completed]);
+        return back();
     }
 }

@@ -24,10 +24,12 @@ Route::get('/register', [UserController::class, 'registerDisplay'])->name('user.
 Route::post('/login', [UserController::class, 'authenticate'])->name('user.login');
 Route::get('/logout', [UserController::class, 'logout'])->name('user.logout')->middleware('auth');
 Route::post('/register', [UserController::class, 'register'])->name('user.register');
+Route::get('/tasks/archive', [TaskController::class, 'archive'])->name('tasks.archive');
 Route::get('/tasks/analytics', [TaskAnalyticsController::class, 'index'])
     ->middleware(['auth'])
     ->name('tasks.analytics');
 Route::get('/tasks/pomodoro', [PomodoroController::class, 'index'])->name('pomodoro.index');
+Route::patch('/tasks/{task}/toggle', [TaskController::class, 'toggleComplete'])->name('tasks.toggle');
 Route::get('/tasks/pomodoro', [PomodoroController::class, 'index'])->name('pomodoro.index')->middleware('auth');
 Route::resource('tasks', TaskController::class)->middleware('auth');
 Route::post('/chatbot/send', [App\Http\Controllers\ChatbotController::class, 'sendMessage'])->name('chatbot.send');

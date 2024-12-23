@@ -1,5 +1,5 @@
 <x-layout>
-    <div class="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 p-6">
+    <div class="min-h-screen bg-gradient-to-br from-black to-gray-800 p-6">
         <div class="max-w-2xl mx-auto">
             <div class="mb-8 text-center relative">
                 <a href="{{ route('tasks.index') }}" class="absolute left-0 top-6 text-gray-600 hover:text-gray-800 transition-colors duration-300">
@@ -210,36 +210,29 @@
                                 name="ReminderTime" 
                                 class="px-4 py-2 border-2 border-gray-200 rounded-lg"
                             />
-                        </div>
+                            </div>
                     </div>
 
-                    <button 
-                        type="submit" 
-                        class="w-full bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold py-3 rounded-lg hover:from-blue-600 hover:to-blue-800 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl"
-                    >
-                        <i class="fas fa-plus mr-2"></i>Create Task
-                    </button>
+                    <div class="mt-8 text-center">
+                        <button 
+                            type="submit" 
+                            class="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold text-lg hover:bg-blue-600 transition duration-300"
+                        >
+                            <i class="fas fa-save mr-2"></i>Create Task
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
 
-    @push('styles')
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <style>
-        input:focus, textarea:focus, select:focus {
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-        }
-    </style>
-    @endpush
-
-    @push('scripts')
     <script>
+        // Handle adding and removing subtasks
         document.getElementById('add-subtask').addEventListener('click', function() {
             const container = document.getElementById('subtasks-container');
-            const newSubtask = document.createElement('div');
-            newSubtask.className = 'flex mb-2';
-            newSubtask.innerHTML = `
+            const subtask = document.createElement('div');
+            subtask.className = 'flex mb-2';
+            subtask.innerHTML = `
                 <input 
                     type="text" 
                     name="Subtasks[]" 
@@ -250,13 +243,19 @@
                     <i class="fas fa-trash"></i>
                 </button>
             `;
-            container.appendChild(newSubtask);
+            container.appendChild(subtask);
 
-            // Add event listener to new remove button
-            newSubtask.querySelector('.remove-subtask').addEventListener('click', function() {
-                container.removeChild(newSubtask);
+            subtask.querySelector('.remove-subtask').addEventListener('click', function() {
+                container.removeChild(subtask);
+            });
+        });
+
+        // Handle removing a subtask
+        document.querySelectorAll('.remove-subtask').forEach(button => {
+            button.addEventListener('click', function(event) {
+                const subtask = event.target.closest('.flex');
+                subtask.parentElement.removeChild(subtask);
             });
         });
     </script>
-    @endpush
 </x-layout>

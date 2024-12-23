@@ -17,6 +17,7 @@ return new class extends Migration
             $table->text("Description")->nullable();
             $table->boolean("Completed");
             $table->integer("user_id");
+			$table->timestamp('DueDate')->nullable();
             $table->timestamps();
         });
     }
