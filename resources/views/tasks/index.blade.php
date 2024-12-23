@@ -16,7 +16,9 @@
                 </div>
                 <div class="flex items-center space-x-4">
                     <div class="bg-white rounded-full p-2 shadow-md">
-                        <i class="fas fa-user-circle text-gray-600 text-2xl"></i>
+                        <a href="{{ route('profile.edit') }}">
+                            <i class="fas fa-user-circle text-gray-600 text-2xl"></i>
+                        </a>
                     </div>
                     <a href="{{ route('user.logout') }}" class="px-4 py-3 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-all duration-300 shadow-md hover:shadow-lg flex items-center">
                         <i class="fas fa-sign-out-alt mr-2"></i>Log Out
